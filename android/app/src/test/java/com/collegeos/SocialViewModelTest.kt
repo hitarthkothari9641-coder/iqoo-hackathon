@@ -13,9 +13,9 @@ class SocialViewModelTest {
         viewModel.loadSocialData()
 
         val state = viewModel.uiState.value
-        assertEquals(2, state.feedPosts.size)
-        assertEquals(2, state.communities.size)
-        assertEquals(2, state.clubs.size)
+        assertEquals(4, state.feedPosts.size)
+        assertEquals(4, state.communities.size)
+        assertEquals(5, state.clubs.size)
         assertTrue(state.clubs.all { it.isApproved })
     }
 }

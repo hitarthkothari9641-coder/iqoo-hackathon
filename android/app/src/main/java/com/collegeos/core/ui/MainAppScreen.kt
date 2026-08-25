@@ -12,7 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -80,31 +88,31 @@ fun MainAppScreen() {
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
                     label = { Text("Home") },
-                    icon = { Text("🏠") }
+                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") }
                 )
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
                     label = { Text("Academics") },
-                    icon = { Text("📚") }
+                    icon = { Icon(Icons.Filled.School, contentDescription = "Academics") }
                 )
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
                     label = { Text("Social") },
-                    icon = { Text("💬") }
+                    icon = { Icon(Icons.Filled.Forum, contentDescription = "Social") }
                 )
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
                     label = { Text("Clubs") },
-                    icon = { Text("🏛️") }
+                    icon = { Icon(Icons.Filled.Groups, contentDescription = "Clubs") }
                 )
                 NavigationBarItem(
                     selected = selectedTab == 4,
                     onClick = { selectedTab = 4 },
                     label = { Text("Profile") },
-                    icon = { Text("👤") }
+                    icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") }
                 )
             }
         }
@@ -121,7 +129,7 @@ fun MainAppScreen() {
                 )
                 1 -> AcademicsScreen(state = academicsState)
                 2 -> SocialScreen(state = socialState)
-                3 -> CommunitiesAndClubsScreen()
+                3 -> CommunitiesAndClubsScreen(socialState)
                 4 -> ProfileAndSettingsScreen()
             }
         }
@@ -164,7 +172,7 @@ fun UnifiedDashboardScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Good morning! You are enrolled in Semester 3 (2026–2027). All academic records and campus updates are synchronized.",
+                        text = "Welcome back, Alex Chen! You are enrolled in B.Tech Computer Science (Sem 3 • 2026–2027). All attendance, marks, and timetables are synchronized.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -174,7 +182,7 @@ fun UnifiedDashboardScreen(
 
         item {
             Text(
-                text = "Next Class & Today's Schedule",
+                text = "Today's Class Schedule (4 Classes)",
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
             )
         }
@@ -185,11 +193,14 @@ fun UnifiedDashboardScreen(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("CS301 • Data Structures & Algorithms", fontWeight = FontWeight.Bold)
-                    Text("Time: 09:00 AM - 10:00 AM | Room: Lab 2 | Dr. XYZ")
+                    Text("NOW: CS301 • Data Structures & Algorithms", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("Time: 09:00 AM - 10:00 AM | Room: CS Lab 2 | Dr. Rajesh Kumar")
                     Spacer(modifier = Modifier.height(8.dp))
+                    Text("NEXT: CS302 • Database Management Systems (10:15 AM @ LH 104)")
+                    Text("THEN: MA301 • Linear Algebra (11:30 AM @ LH 201)")
+                    Spacer(modifier = Modifier.height(12.dp))
                     Button(onClick = onNavigateToAcademics) {
-                        Text("View Full Timetable & Attendance")
+                        Text("View Full Weekly Timetable & Rooms")
                     }
                 }
             }
@@ -197,7 +208,7 @@ fun UnifiedDashboardScreen(
 
         item {
             Text(
-                text = "Quick Access Modules",
+                text = "Academic & Attendance Overview",
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
             )
         }
@@ -211,7 +222,8 @@ fun UnifiedDashboardScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text("📊 Attendance", fontWeight = FontWeight.Bold)
-                            Text("90.8% Overall")
+                            Text("90.8% Overall", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                            Text("Safe (+3 classes margin)", style = MaterialTheme.typography.labelSmall)
                         }
                     }
                     Card(
@@ -220,7 +232,8 @@ fun UnifiedDashboardScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text("📝 Assignments", fontWeight = FontWeight.Bold)
-                            Text("1 Due Tomorrow")
+                            Text("2 Pending", color = Color(0xFFEAB308), fontWeight = FontWeight.Bold)
+                            Text("B-Tree Due Tomorrow", style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -232,7 +245,8 @@ fun UnifiedDashboardScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text("💬 Campus Social", fontWeight = FontWeight.Bold)
-                            Text("Trending Posts & Updates")
+                            Text("4 New Updates", fontWeight = FontWeight.Bold)
+                            Text("TechFest 2026 Open", style = MaterialTheme.typography.labelSmall)
                         }
                     }
                     Card(
@@ -241,9 +255,29 @@ fun UnifiedDashboardScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text("📖 Study Planner", fontWeight = FontWeight.Bold)
-                            Text("2 Study Tasks")
+                            Text("3 Tasks Remaining", fontWeight = FontWeight.Bold)
+                            Text("AVL Trees High Priority", style = MaterialTheme.typography.labelSmall)
                         }
                     }
+                }
+            }
+        }
+
+        item {
+            Text(
+                text = "Upcoming Midterm Examinations",
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            )
+        }
+
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("CS301 Data Structures & Algorithms Midterm", fontWeight = FontWeight.Bold)
+                    Text("Date: Oct 12, 2026 @ 10:00 AM | Hall: Exam Center 1 | Max Marks: 100")
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("CS302 Database Management Systems Midterm", fontWeight = FontWeight.Bold)
+                    Text("Date: Oct 14, 2026 @ 02:00 PM | Hall: Exam Center 2 | Max Marks: 100")
                 }
             }
         }
@@ -260,6 +294,7 @@ fun UnifiedDashboardScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("🚀 TechFest 2026 Hackathon Registration Open", fontWeight = FontWeight.Bold)
                     Text("Published by Department of Computer Science • 2 hours ago")
+                    Text("Build AI & IoT solutions for smart campus mobility. ₹1,00,000 cash prizes!")
                 }
             }
         }
@@ -267,7 +302,7 @@ fun UnifiedDashboardScreen(
 }
 
 @Composable
-fun CommunitiesAndClubsScreen() {
+fun CommunitiesAndClubsScreen(socialState: com.collegeos.feature.social.SocialState) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -276,51 +311,59 @@ fun CommunitiesAndClubsScreen() {
     ) {
         item {
             Text(
-                text = "Campus Communities & Verified Clubs",
+                text = "Verified Clubs & Campus Communities",
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "Join interest groups and official college clubs.",
+                text = "Official institution-recognized student clubs and active interest groups.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary
             )
         }
 
         item {
-            Text("Featured Clubs", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            Text("Verified Institution Clubs (${socialState.clubs.size})", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
         }
 
-        item {
+        items(socialState.clubs) { club ->
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Official Coding Club ✓", fontWeight = FontWeight.Bold)
-                    Text("Competitive programming, hackathons, and open source projects.")
-                    Text("210 Active Members • Faculty Advisor: Dr. ABC")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(club.name, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text("✓ Approved", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
+                    }
+                    Text("Category: ${club.category} | ${club.membersCount} Active Members", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(club.description)
+                    Text("Faculty Advisor: ${club.facultyAdvisor}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedButton(onClick = {}) {
+                        Text("View Club Portal & Events")
+                    }
                 }
             }
         }
 
         item {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Model United Nations (MUN) ✓", fontWeight = FontWeight.Bold)
-                    Text("Global policy, diplomacy, and inter-college debate competitions.")
-                    Text("95 Active Members")
-                }
-            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Campus Interest Communities (${socialState.communities.size})", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
         }
 
-        item {
-            Text("Campus Communities", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-        }
-
-        item {
+        items(socialState.communities) { comm ->
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("AI & Machine Learning Group", fontWeight = FontWeight.Bold)
-                    Text("Discussion on LLMs, computer vision, and neural network research.")
-                    Text("142 Members")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(comm.name, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (comm.isJoined) {
+                            Text("Joined ✓", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                    Text(comm.description)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("${comm.membersCount} Members • ${comm.category}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
                 }
             }
         }
@@ -347,11 +390,13 @@ fun ProfileAndSettingsScreen() {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Alex Chen", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-                    Text("Student ID: 2024CS108 • Verified Student ✓", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Text("Student USN: 2024CS108 • Verified Student ✓", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Department: Department of Computer Science")
+                    Text("Department: Department of Computer Science & Engineering")
                     Text("Program: B.Tech Computer Science & Engineering")
-                    Text("Current Year: 2nd Year (Semester 3)")
+                    Text("Current Academic Year: 2nd Year (Semester 3)")
+                    Text("Cumulative GPA (CGPA): 8.92 / 10.0")
+                    Text("Earned Credits: 64 / 160 Credits")
                     Text("Institutional Email: alex.chen@campus.edu")
                 }
             }
@@ -360,9 +405,22 @@ fun ProfileAndSettingsScreen() {
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("ERP Connection Status", fontWeight = FontWeight.Bold)
-                    Text("Status: CONNECTED (Mock ERP Provider)", color = MaterialTheme.colorScheme.primary)
-                    Text("Last Synced: Today @ 23:00")
+                    Text("Campus ERP Integration Status", fontWeight = FontWeight.Bold)
+                    Text("Provider: Mock ERP Provider v2.1", color = MaterialTheme.colorScheme.onSurface)
+                    Text("Status: CONNECTED & SYNCED", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Text("Last Incremental Sync: Today @ 23:25")
+                    Text("Circuit Breaker Status: CLOSED (Healthy 100%)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
+                }
+            }
+        }
+
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Security & Privacy Settings", fontWeight = FontWeight.Bold)
+                    Text("Social Visibility: COLLEGE (Campus Scoped)")
+                    Text("Token Refresh Engine: SHA-256 Rotation Active")
+                    Text("Multi-Factor Authentication: Enabled")
                 }
             }
         }

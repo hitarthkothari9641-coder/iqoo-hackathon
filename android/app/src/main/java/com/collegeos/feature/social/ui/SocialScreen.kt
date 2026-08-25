@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -20,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,7 +48,7 @@ fun SocialScreen(
         )
 
         Text(
-            text = "Private Campus Social OS",
+            text = "Private Campus Social OS • Multi-Level Visibility Scopes",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -67,7 +71,7 @@ fun SocialScreen(
             0 -> FeedList(state.feedPosts)
             1 -> CommunityList(state.communities)
             2 -> ClubList(state.clubs)
-            3 -> DiscoverPlaceholder()
+            3 -> DiscoverList()
         }
     }
 }
@@ -83,22 +87,30 @@ fun FeedList(items: List<com.collegeos.feature.social.PostUiItem>) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row {
-                        Text(post.authorName, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                        Text(post.authorHandle, color = MaterialTheme.colorScheme.secondary)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column {
+                            Text(post.authorName, fontWeight = FontWeight.Bold)
+                            Text("${post.authorHandle} • ${post.authorRoleBadge}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
+                        }
                         Spacer(modifier = Modifier.weight(1f))
-                        Text(post.timeAgoText, style = MaterialTheme.typography.bodySmall)
+                        Text(post.timeAgoText, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
                     }
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(post.content)
+                    Text(post.content, style = MaterialTheme.typography.bodyMedium)
+
+                    if (post.tag != null) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("Category: ${post.tag}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    }
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    Row {
-                        Text("❤️ ${post.likesCount}")
-                        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-                        Text("💬 ${post.commentsCount}")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(if (post.isLiked) "❤️ ${post.likesCount} Liked" else "🤍 ${post.likesCount} Like")
+                        Spacer(modifier = Modifier.padding(horizontal = 12.dp))
+                        Text("💬 ${post.commentsCount} Comments")
                         Spacer(modifier = Modifier.weight(1f))
-                        Text("Scope: ${post.visibility}", style = MaterialTheme.typography.bodySmall)
+                        Text("Scope: ${post.visibility}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
@@ -112,9 +124,16 @@ fun CommunityList(items: List<com.collegeos.feature.social.CommunityUiItem>) {
         items(items) { comm ->
             Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(comm.name, fontWeight = FontWeight.Bold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(comm.name, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (comm.isJoined) {
+                            Text("Joined ✓", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        }
+                    }
                     Text(comm.description)
-                    Text("${comm.membersCount} Members • ${comm.category}", style = MaterialTheme.typography.bodySmall)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("${comm.membersCount} Active Members • ${comm.category}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
                 }
             }
         }
@@ -127,14 +146,17 @@ fun ClubList(items: List<com.collegeos.feature.social.ClubUiItem>) {
         items(items) { club ->
             Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row {
-                        Text(club.name, fontWeight = FontWeight.Bold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(club.name, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.weight(1f))
                         if (club.isApproved) {
                             Text("✓ Verified Club", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         }
                     }
-                    Text("Category: ${club.category} | ${club.membersCount} Members")
+                    Text("Category: ${club.category} • ${club.membersCount} Members")
+                    Text("Faculty Advisor: ${club.facultyAdvisor}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(club.description, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -142,11 +164,33 @@ fun ClubList(items: List<com.collegeos.feature.social.ClubUiItem>) {
 }
 
 @Composable
-fun DiscoverPlaceholder() {
-    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("Campus Discovery", fontWeight = FontWeight.Bold)
-            Text("Search students by program, department, and interests within your college.")
+fun DiscoverList() {
+    LazyColumn {
+        item {
+            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Campus User Discovery", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text("Discover verified students, faculty members, and researchers within your college tenant.")
+                }
+            }
+        }
+        item {
+            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Dr. Rajesh Kumar", fontWeight = FontWeight.Bold)
+                    Text("Professor & HOD • Department of Computer Science & Engineering")
+                    Text("Interests: Machine Learning, Data Structures, Distributed Systems")
+                }
+            }
+        }
+        item {
+            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Priya Sharma", fontWeight = FontWeight.Bold)
+                    Text("Student • Electronics & Communication Engineering (Sem 5)")
+                    Text("Interests: IoT, Robotics, Signal Processing, Photography")
+                }
+            }
         }
     }
 }

@@ -13,10 +13,10 @@ class AcademicsViewModelTest {
         viewModel.loadAcademicsData()
 
         val state = viewModel.uiState.value
-        assertEquals(2, state.timetable.size)
-        assertEquals(2, state.attendance.size)
-        assertEquals(1, state.exams.size)
-        assertEquals(1, state.results.size)
+        assertEquals(4, state.timetable.size)
+        assertEquals(5, state.attendance.size)
+        assertEquals(3, state.exams.size)
+        assertEquals(4, state.results.size)
         assertTrue(state.lastUpdatedText.contains("Synced"))
     }
 }
