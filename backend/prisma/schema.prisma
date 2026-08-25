@@ -1,0 +1,205 @@
+// ==============================================================================
+// COLLEGE OS - Prisma Database Schema (Phase 1 Foundation)
+// ==============================================================================
+// Multi-tenant architecture designed for colleges & universities.
+// Identifiers: UUID v4 (Non-sequential to prevent enumeration).
+// Multi-Tenancy: Institution-scoped data isolation via institutionId foreign keys.
+// ==============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InstitutionStatus {
+  ACTIVE
+  SUSPENDED
+  ONBOARDING
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING_VERIFICATION
+  SUSPENDED
+}
+
+// ------------------------------------------------------------------------------
+// Institution (Tenant Root)
+// ------------------------------------------------------------------------------
+model Institution {
+  id          String            @id @default(uuid()) @db.Uuid
+  name        String            @db.VarChar(255)
+  slug        String            @unique @db.VarChar(100)
+  domain      String?           @db.VarChar(255)
+  status      InstitutionStatus @default(ACTIVE)
+  settings    Json?             @default("{}")
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  users       User[]
+  roles       Role[]
+  userRoles   UserRole[]
+  auditLogs   AuditLog[]
+
+  @@index([status])
+  @@index([slug])
+  @@map("institutions")
+}
+
+// ------------------------------------------------------------------------------
+// User (Institutional Member)
+// ------------------------------------------------------------------------------
+model User {
+  id            String      @id @default(uuid()) @db.Uuid
+  institutionId String      @map("institution_id") @db.Uuid
+  email         String      @db.VarChar(255)
+  phone         String?     @db.VarChar(50)
+  firstName     String      @map("first_name") @db.VarChar(100)
+  lastName      String      @map("last_name") @db.VarChar(100)
+  avatarUrl     String?     @map("avatar_url") @db.VarChar(500)
+  status        UserStatus  @default(PENDING_VERIFICATION)
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  userRoles     UserRole[]
+  sessions      Session[]
+  auditLogs     AuditLog[]
+
+  // Multi-tenancy rule: Email is strictly unique within the institution scope.
+  @@unique([institutionId, email], name: "unique_institution_email")
+  @@index([institutionId])
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// ------------------------------------------------------------------------------
+// Role (RBAC System)
+// ------------------------------------------------------------------------------
+model Role {
+  id            String          @id @default(uuid()) @db.Uuid
+  institutionId String?         @map("institution_id") @db.Uuid
+  name          String          @db.VarChar(100)
+  description   String?         @db.VarChar(255)
+  isSystemRole  Boolean         @default(false) @map("is_system_role")
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime        @updatedAt @map("updated_at") @db.Timestamptz
+
+  institution   Institution?    @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  permissions   RolePermission[]
+  userRoles     UserRole[]
+
+  @@unique([institutionId, name], name: "unique_institution_role_name")
+  @@index([institutionId])
+  @@map("roles")
+}
+
+// ------------------------------------------------------------------------------
+// Permission (Granular Access Capability)
+// ------------------------------------------------------------------------------
+model Permission {
+  id          String           @id @default(uuid()) @db.Uuid
+  name        String           @unique @db.VarChar(100) // e.g. "academics:read", "attendance:mark"
+  description String?          @db.VarChar(255)
+  module      String           @db.VarChar(50)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz
+
+  roles       RolePermission[]
+
+  @@index([module])
+  @@map("permissions")
+}
+
+// ------------------------------------------------------------------------------
+// Role-Permission Join
+// ------------------------------------------------------------------------------
+model RolePermission {
+  id           String     @id @default(uuid()) @db.Uuid
+  roleId       String     @map("role_id") @db.Uuid
+  permissionId String     @map("permission_id") @db.Uuid
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// ------------------------------------------------------------------------------
+// UserRole (User Role Assignment scoped to Tenant)
+// ------------------------------------------------------------------------------
+model UserRole {
+  id            String      @id @default(uuid()) @db.Uuid
+  userId        String      @map("user_id") @db.Uuid
+  roleId        String      @map("role_id") @db.Uuid
+  institutionId String      @map("institution_id") @db.Uuid
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId, institutionId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([institutionId])
+  @@map("user_roles")
+}
+
+// ------------------------------------------------------------------------------
+// Session (Authentication Tokens & Devices)
+// ------------------------------------------------------------------------------
+model Session {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  refreshTokenHash String    @map("refresh_token_hash") @db.VarChar(255)
+  deviceId         String?   @map("device_id") @db.VarChar(100)
+  userAgent        String?   @map("user_agent") @db.VarChar(500)
+  ipAddress        String?   @map("ip_address") @db.VarChar(45)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshTokenHash])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ------------------------------------------------------------------------------
+// AuditLog (Security & Compliance Tracking)
+// ------------------------------------------------------------------------------
+model AuditLog {
+  id            String       @id @default(uuid()) @db.Uuid
+  institutionId String?      @map("institution_id") @db.Uuid
+  actorUserId   String?      @map("actor_user_id") @db.Uuid
+  action        String       @db.VarChar(100) // e.g. "AUTH_LOGIN", "ROLE_ASSIGNED"
+  resourceType  String       @map("resource_type") @db.VarChar(100)
+  resourceId    String?      @map("resource_id") @db.VarChar(100)
+  metadata      Json?        @default("{}")
+  ipAddress     String?      @map("ip_address") @db.VarChar(45)
+  userAgent     String?      @map("user_agent") @db.VarChar(500)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  actorUser     User?        @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([institutionId])
+  @@index([actorUserId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

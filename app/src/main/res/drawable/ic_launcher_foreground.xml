@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.55"
+        android:scaleY="0.55"
+        android:translateX="24.3"
+        android:translateY="24.3">
+        <!-- Calendar Base -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M80,20h-8v-8h-8v8H44v-8h-8v8h-8c-4.4,0 -8,3.6 -8,8v64c0,4.4 3.6,8 8,8h64c4.4,0 8,-3.6 8,-8V28C88,23.6 84.4,20 80,20zM80,84H28V36h52V84z" />
+        <!-- Calendar Grid / AI Star Accent -->
+        <path
+            android:fillColor="#06B6D4"
+            android:pathData="M36,46h12v12H36z" />
+        <path
+            android:fillColor="#3B82F6"
+            android:pathData="M60,46h12v12H60z" />
+        <path
+            android:fillColor="#10B981"
+            android:pathData="M36,66h12v12H36z" />
+        <path
+            android:fillColor="#F59E0B"
+            android:pathData="M60,66h12v12H60z" />
+    </group>
+</vector>

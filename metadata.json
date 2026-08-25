@@ -1,0 +1,6 @@
+{
+  "name": "College OS",
+  "description": "Your college. Your community. Your future. The private digital campus combining ERP, Social, Learn, Clubs, Career, and AI Assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
