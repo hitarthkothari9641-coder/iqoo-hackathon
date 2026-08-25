@@ -1,10 +1,16 @@
-import { Injectable, CanActivate, ExecutionContext, SetMetadata } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  SetMetadata,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ApiException } from '../errors/api-error';
 import { ErrorCode } from '../errors/error-codes';
 
 export const PERMISSIONS_KEY = 'permissions';
-export const RequirePermissions = (...permissions: string[]) => SetMetadata(PERMISSIONS_KEY, permissions);
+export const RequirePermissions = (...permissions: string[]) =>
+  SetMetadata(PERMISSIONS_KEY, permissions);
 
 export interface AuthenticatedUserContext {
   id: string;
@@ -15,12 +21,20 @@ export interface AuthenticatedUserContext {
 }
 
 export interface IAuthorizationService {
-  can(user: AuthenticatedUserContext, permission: string, resource?: unknown): Promise<boolean>;
+  can(
+    user: AuthenticatedUserContext,
+    permission: string,
+    resource?: unknown,
+  ): Promise<boolean>;
 }
 
 @Injectable()
 export class AuthorizationService implements IAuthorizationService {
-  async can(user: AuthenticatedUserContext, permission: string, resource?: unknown): Promise<boolean> {
+  async can(
+    user: AuthenticatedUserContext,
+    permission: string,
+    _resource?: unknown,
+  ): Promise<boolean> {
     // Foundation RBAC check with future ABAC capability
     if (!user || !user.permissions) {
       return false;
@@ -35,7 +49,9 @@ export class AuthorizationService implements IAuthorizationService {
     return (
       user.permissions.includes(permission) ||
       user.permissions.includes('*') ||
-      user.permissions.some((p) => p.endsWith(':*') && permission.startsWith(p.replace(':*', '')))
+      user.permissions.some(
+        (p) => p.endsWith(':*') && permission.startsWith(p.replace(':*', '')),
+      )
     );
   }
 }
@@ -48,10 +64,10 @@ export class RbacGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
@@ -61,7 +77,10 @@ export class RbacGuard implements CanActivate {
     const user = request.user as AuthenticatedUserContext;
 
     if (!user) {
-      throw ApiException.unauthorized('User not authenticated.', ErrorCode.UNAUTHORIZED);
+      throw ApiException.unauthorized(
+        'User not authenticated.',
+        ErrorCode.UNAUTHORIZED,
+      );
     }
 
     for (const perm of requiredPermissions) {

@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { AppConfigService } from '../config/config.service';
 import Redis from 'ioredis';
 
@@ -11,10 +16,15 @@ export interface ICacheService {
 }
 
 @Injectable()
-export class CacheService implements ICacheService, OnModuleInit, OnModuleDestroy {
+export class CacheService
+  implements ICacheService, OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(CacheService.name);
   private client: Redis | null = null;
-  private inMemoryFallback = new Map<string, { value: string; expiresAt?: number }>();
+  private inMemoryFallback = new Map<
+    string,
+    { value: string; expiresAt?: number }
+  >();
   private isConnected = false;
 
   constructor(private readonly configService: AppConfigService) {}
@@ -42,9 +52,13 @@ export class CacheService implements ICacheService, OnModuleInit, OnModuleDestro
       this.client.on('error', (err) => {
         this.isConnected = false;
         if (redisConfig.required) {
-          this.logger.error(`Redis connection error (REQUIRED): ${err.message}`);
+          this.logger.error(
+            `Redis connection error (REQUIRED): ${err.message}`,
+          );
         } else {
-          this.logger.warn(`Redis unavailable (OPTIONAL in development, using in-memory fallback): ${err.message}`);
+          this.logger.warn(
+            `Redis unavailable (OPTIONAL in development, using in-memory fallback): ${err.message}`,
+          );
         }
       });
 
@@ -52,13 +66,17 @@ export class CacheService implements ICacheService, OnModuleInit, OnModuleDestro
         if (redisConfig.required) {
           throw err;
         }
-        this.logger.warn(`Redis connection failed (OPTIONAL mode enabled): ${err.message}`);
+        this.logger.warn(
+          `Redis connection failed (OPTIONAL mode enabled): ${err.message}`,
+        );
       });
     } catch (err) {
       if (redisConfig.required) {
         throw err;
       }
-      this.logger.warn('Operating CacheService in in-memory fallback mode for local development.');
+      this.logger.warn(
+        'Operating CacheService in in-memory fallback mode for local development.',
+      );
     }
   }
 
@@ -74,7 +92,9 @@ export class CacheService implements ICacheService, OnModuleInit, OnModuleDestro
         const data = await this.client.get(key);
         return data ? (JSON.parse(data) as T) : null;
       } catch (err) {
-        this.logger.warn(`Redis get failed for key ${key}: ${(err as Error).message}`);
+        this.logger.warn(
+          `Redis get failed for key ${key}: ${(err as Error).message}`,
+        );
       }
     }
 
@@ -100,7 +120,9 @@ export class CacheService implements ICacheService, OnModuleInit, OnModuleDestro
         }
         return;
       } catch (err) {
-        this.logger.warn(`Redis set failed for key ${key}: ${(err as Error).message}`);
+        this.logger.warn(
+          `Redis set failed for key ${key}: ${(err as Error).message}`,
+        );
       }
     }
 
@@ -116,7 +138,9 @@ export class CacheService implements ICacheService, OnModuleInit, OnModuleDestro
       try {
         await this.client.del(key);
       } catch (err) {
-        this.logger.warn(`Redis del failed for key ${key}: ${(err as Error).message}`);
+        this.logger.warn(
+          `Redis del failed for key ${key}: ${(err as Error).message}`,
+        );
       }
     }
     this.inMemoryFallback.delete(key);

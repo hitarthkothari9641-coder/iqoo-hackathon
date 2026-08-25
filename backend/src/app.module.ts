@@ -11,7 +11,7 @@ import { TenantMiddleware } from './common/middleware/tenant.middleware';
 import { EventBusService } from './common/events/event-bus.service';
 import { StorageService } from './common/storage/storage.service';
 import { FeatureFlagService } from './common/feature-flags/feature-flag.service';
-import { AuthorizationService } from './common/guards/rbac.guard';
+import { AuthorizationService } from './common/guards/authorization.service';
 
 // Core Domain Modules Foundation
 import { AuthModule } from './modules/auth/auth.module';
@@ -81,8 +81,6 @@ import { AdminModule } from './modules/admin/admin.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RequestIdMiddleware, TenantMiddleware)
-      .forRoutes('*');
+    consumer.apply(RequestIdMiddleware, TenantMiddleware).forRoutes('*');
   }
 }

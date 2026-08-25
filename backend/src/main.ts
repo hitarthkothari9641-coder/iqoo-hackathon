@@ -27,7 +27,13 @@ async function bootstrap() {
     origin: configService.cors.origins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'X-Institution-Id', 'X-Institution-Slug'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Request-Id',
+      'X-Institution-Id',
+      'X-Institution-Slug',
+    ],
   });
 
   // Global Versioned API Prefix
@@ -58,15 +64,22 @@ async function bootstrap() {
   if (!configService.isProduction) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('College OS API')
-      .setDescription('Production-grade Academic & Campus Operating System API Foundation')
+      .setDescription(
+        'Production-grade Academic & Campus Operating System API Foundation',
+      )
       .setVersion(configService.app.version)
       .addBearerAuth()
-      .addTag('health', 'System health, liveness, and dependency readiness probes')
+      .addTag(
+        'health',
+        'System health, liveness, and dependency readiness probes',
+      )
       .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api/docs', app, document);
-    logger.log(`OpenAPI Documentation initialized at: http://localhost:${configService.app.port}/api/docs`);
+    logger.log(
+      `OpenAPI Documentation initialized at: http://localhost:${configService.app.port}/api/docs`,
+    );
   }
 
   await app.listen(configService.app.port);

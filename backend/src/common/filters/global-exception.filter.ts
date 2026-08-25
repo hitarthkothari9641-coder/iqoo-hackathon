@@ -19,7 +19,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const requestId = (request.headers['x-request-id'] as string) || 'req-unknown';
+    const requestId =
+      (request.headers['x-request-id'] as string) || 'req-unknown';
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let code: string = ErrorCode.INTERNAL_SERVER_ERROR;

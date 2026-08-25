@@ -2,34 +2,60 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { loginAdmin } from '../../../lib/auth';
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in both email and password.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { token } = await loginAdmin(email, password);
+      localStorage.setItem('admin_token', token);
+      router.push('/admin/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-slate-50">
       <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="text-center space-y-2">
           <div className="inline-block rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-            Institutional Admin
+            Institutional Admin Console
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-            College OS Console
+            COLLEGE OS
           </h2>
           <p className="text-xs text-slate-500">
-            Phase 1 Authentication Boundary: Real backend authentication will be enabled in Phase 2.
+            Sign in with your institutional administrator or faculty credentials.
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-xs font-medium text-slate-700">Institutional Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@university.edu"
+              placeholder="admin@demo.collegeos.edu"
               className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none"
             />
           </div>
@@ -45,16 +71,18 @@ export default function AdminLoginPage() {
             />
           </div>
 
-          <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
-            <strong>Security Boundary Notice:</strong> Client-side authentication is intentionally non-functional in Phase 1. Backend authorization is authoritative.
-          </div>
+          {error && (
+            <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-xs text-red-700">
+              {error}
+            </div>
+          )}
 
           <button
-            type="button"
-            disabled
-            className="w-full rounded-lg bg-slate-400 px-4 py-2.5 text-sm font-medium text-white cursor-not-allowed opacity-75"
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-slate-800 transition-colors disabled:opacity-50"
           >
-            Sign In (Phase 2)
+            {loading ? 'Authenticating...' : 'Sign In'}
           </button>
         </form>
 

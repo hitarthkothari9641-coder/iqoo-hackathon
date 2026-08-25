@@ -57,7 +57,9 @@ export class HealthService {
     let cacheStatus: 'healthy' | 'unhealthy' | 'fallback' = 'healthy';
     const isRedisHealthy = await this.cache.isHealthy();
     if (!isRedisHealthy) {
-      cacheStatus = this.configService.redis.required ? 'unhealthy' : 'fallback';
+      cacheStatus = this.configService.redis.required
+        ? 'unhealthy'
+        : 'fallback';
     }
 
     const isReady = dbStatus === 'healthy' && cacheStatus !== 'unhealthy';

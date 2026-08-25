@@ -11,7 +11,7 @@ export default function HomePage() {
           COLLEGE OS
         </h1>
         <p className="text-lg text-slate-600">
-          "Your college. Your community. Your future."
+          &quot;Your college. Your community. Your future.&quot;
         </p>
         <div className="pt-4 flex justify-center gap-4">
           <Link

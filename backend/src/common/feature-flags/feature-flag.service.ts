@@ -32,7 +32,9 @@ export class FeatureFlagService {
   };
 
   isEnabled(flag: FeatureFlagKey, institutionId?: string): boolean {
-    this.logger.debug(`[FEATURE_FLAG] Evaluating ${flag} for tenant: ${institutionId || 'GLOBAL'}`);
+    this.logger.debug(
+      `[FEATURE_FLAG] Evaluating ${flag} for tenant: ${institutionId || 'GLOBAL'}`,
+    );
     return this.defaultFlags[flag] ?? false;
   }
 }

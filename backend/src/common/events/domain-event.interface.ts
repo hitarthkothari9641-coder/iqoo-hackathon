@@ -8,7 +8,9 @@ export interface DomainEvent<T = unknown> {
   metadata?: Record<string, unknown>;
 }
 
-export type DomainEventHandler<T = unknown> = (event: DomainEvent<T>) => Promise<void> | void;
+export type DomainEventHandler<T = unknown> = (
+  event: DomainEvent<T>,
+) => Promise<void> | void;
 
 export interface IEventBus {
   publish<T>(event: DomainEvent<T>): Promise<void>;

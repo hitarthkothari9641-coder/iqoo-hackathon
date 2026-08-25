@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { CommunitiesController } from './communities.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  providers: [],
-  exports: [],
+  imports: [AuthModule],
+  controllers: [CommunitiesController],
 })
 export class CommunitiesModule {}

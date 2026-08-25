@@ -1,5 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DomainEvent, DomainEventHandler, IEventBus } from './domain-event.interface';
+import {
+  DomainEvent,
+  DomainEventHandler,
+  IEventBus,
+} from './domain-event.interface';
 
 @Injectable()
 export class EventBusService implements IEventBus {
@@ -7,14 +11,18 @@ export class EventBusService implements IEventBus {
   private readonly handlers = new Map<string, DomainEventHandler[]>();
 
   async publish<T>(event: DomainEvent<T>): Promise<void> {
-    this.logger.debug(`[EVENT] Publishing: ${event.eventType} (Aggregate: ${event.aggregateId})`);
+    this.logger.debug(
+      `[EVENT] Publishing: ${event.eventType} (Aggregate: ${event.aggregateId})`,
+    );
     const registeredHandlers = this.handlers.get(event.eventType) || [];
 
     for (const handler of registeredHandlers) {
       try {
         await handler(event);
       } catch (err) {
-        this.logger.error(`[EVENT ERROR] Failed handler for ${event.eventType}: ${(err as Error).message}`);
+        this.logger.error(
+          `[EVENT ERROR] Failed handler for ${event.eventType}: ${(err as Error).message}`,
+        );
       }
     }
   }

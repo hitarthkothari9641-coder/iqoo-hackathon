@@ -10,8 +10,14 @@ import { Request } from 'express';
 import { ApiSuccessResponse } from '../errors/error-codes';
 
 @Injectable()
-export class TransformResponseInterceptor<T> implements NestInterceptor<T, ApiSuccessResponse<T>> {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<ApiSuccessResponse<T>> {
+export class TransformResponseInterceptor<T> implements NestInterceptor<
+  T,
+  ApiSuccessResponse<T>
+> {
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Observable<ApiSuccessResponse<T>> {
     const req = context.switchToHttp().getRequest<Request>();
     const requestId = (req.headers['x-request-id'] as string) || undefined;
 

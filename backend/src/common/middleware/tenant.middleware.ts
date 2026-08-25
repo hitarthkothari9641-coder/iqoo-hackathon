@@ -28,7 +28,12 @@ export class TenantMiddleware implements NestMiddleware {
     // Subdomain resolution (e.g. stanford.collegeos.edu)
     let slug: string | undefined = undefined;
     const hostParts = host.split('.');
-    if (hostParts.length > 2 && hostParts[0] !== 'api' && hostParts[0] !== 'admin' && hostParts[0] !== 'localhost') {
+    if (
+      hostParts.length > 2 &&
+      hostParts[0] !== 'api' &&
+      hostParts[0] !== 'admin' &&
+      hostParts[0] !== 'localhost'
+    ) {
       slug = hostParts[0];
     } else if (headerTenantSlug) {
       slug = headerTenantSlug;
@@ -37,7 +42,7 @@ export class TenantMiddleware implements NestMiddleware {
     req.tenant = {
       institutionId: headerTenantId || null,
       slug: slug || undefined,
-      source: headerTenantId ? 'header' : (slug ? 'host' : 'default'),
+      source: headerTenantId ? 'header' : slug ? 'host' : 'default',
       isResolved: !!(headerTenantId || slug),
     };
 

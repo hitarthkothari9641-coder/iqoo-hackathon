@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { ClubsController } from './clubs.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  providers: [],
-  exports: [],
+  imports: [AuthModule],
+  controllers: [ClubsController],
 })
 export class ClubsModule {}

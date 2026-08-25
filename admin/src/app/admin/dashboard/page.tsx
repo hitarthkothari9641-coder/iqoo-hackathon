@@ -87,7 +87,7 @@ export default function AdminDashboardPage() {
                 Environment Status & Architectural Readiness
               </h2>
               <p className="text-sm text-slate-600 mt-1">
-                "Your college. Your community. Your future."
+                &quot;Your college. Your community. Your future.&quot;
               </p>
             </div>
             <div className="flex gap-2">

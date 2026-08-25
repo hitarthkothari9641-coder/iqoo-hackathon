@@ -108,7 +108,9 @@ export const configuration = () => {
       apiPrefix: env.API_PREFIX || '/api/v1',
     },
     database: {
-      url: env.DATABASE_URL || 'postgresql://collegeos_user:collegeos_password@localhost:5432/collegeos_db?schema=public',
+      url:
+        env.DATABASE_URL ||
+        'postgresql://collegeos_user:collegeos_password@localhost:5432/collegeos_db?schema=public',
       poolMin: parseInt(env.DATABASE_POOL_MIN || '2', 10),
       poolMax: parseInt(env.DATABASE_POOL_MAX || '10', 10),
     },
@@ -120,8 +122,12 @@ export const configuration = () => {
       required: env.REDIS_REQUIRED === 'true',
     },
     security: {
-      jwtAccessSecret: env.JWT_ACCESS_SECRET || 'dev_fallback_insecure_jwt_key_do_not_use_in_prod',
-      jwtRefreshSecret: env.JWT_REFRESH_SECRET || 'dev_fallback_insecure_refresh_key_do_not_use_in_prod',
+      jwtAccessSecret:
+        env.JWT_ACCESS_SECRET ||
+        'dev_fallback_insecure_jwt_key_do_not_use_in_prod',
+      jwtRefreshSecret:
+        env.JWT_REFRESH_SECRET ||
+        'dev_fallback_insecure_refresh_key_do_not_use_in_prod',
       jwtAccessExpiresIn: env.JWT_ACCESS_EXPIRES_IN || '15m',
       jwtRefreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN || '7d',
       saltRounds: parseInt(env.PASSWORD_SALT_ROUNDS || '12', 10),
